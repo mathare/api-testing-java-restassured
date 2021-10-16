@@ -19,7 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class CommonSteps {
 
@@ -119,7 +120,7 @@ public class CommonSteps {
 
     @Then("the response has a status code of {int}")
     public static void verifyResponseStatusCode(int code) {
-        assertEquals(code, response.getStatusCode());
+        assertThat(response.getStatusCode(), equalTo(code));
     }
 
     @Then("the response body follows the {string} JSON schema")
@@ -138,14 +139,14 @@ public class CommonSteps {
     @Then("the results array contains {int} elements")
     public static void verifyNumberOfResultsArrayElements(int numElements) {
         JSONArray results = new JSONArray(response.asString());
-        assertEquals(numElements, results.length());
+        assertThat(results.length(), equalTo(numElements));
     }
 
     @Then("the response body matches the {string} expected response")
     public static void verifyResponseBodyAgainstExpectedResponse(String expectedResponse) throws IOException {
         String filename = EXPECTED_RESPONSES_DIR + expectedResponse.replaceAll(" ", "") + "Response.json";
         String json = Files.readString(new File(filename).toPath());
-        assertEquals(json.replace("\r", ""), response.asString());
+        assertThat(response.asString(), equalTo(json.replace("\r", "")));
     }
 
     @Then("^the response body matches the (\\d+).{2} (?:post|comment|album|todo|user) in the \"(.*)\" expected response$")
@@ -154,20 +155,20 @@ public class CommonSteps {
         String json = Files.readString(new File(filename).toPath());
         JSONObject expected = new JSONArray(json).getJSONObject(index - 1);
         JSONObject actual = new JSONObject(response.asString());
-        assertEquals(expected.toString(), actual.toString());
+        assertThat(actual.toString(), equalTo(expected.toString()));
     }
 
     @Then("the response body matches the following")
     public static void verifyResponseBodyAgainstDataTable(DataTable dataTable) {
         Map<String, String> expectedBody = dataTable.subTable(1, 0).asMap(String.class, String.class);
         JSONObject actual = new JSONObject(response.asString());
-        assertEquals(expectedBody.keySet(), actual.keySet());
-        expectedBody.forEach((k, v) -> assertEquals(expectedBody.get(k), actual.get(k).toString()));
+        assertThat(actual.keySet(), equalTo(expectedBody.keySet()));
+        expectedBody.forEach((k, v) -> assertThat(actual.get(k).toString(), equalTo(expectedBody.get(k))));
     }
 
     @Then("the response body is an empty JSON object")
     public static void verifyResponseBodyIsEmptyJSONObject() {
-        assertEquals(new JSONObject().toString(), response.asString());
+        assertThat(response.asString(), equalTo(new JSONObject().toString()));
     }
 
     @Then("the two response bodies are identical")
@@ -180,6 +181,6 @@ public class CommonSteps {
                 responseBodies[i] = new JSONObject((responseBodies[i])).toString();
             }
         }
-        assertEquals(responseBodies[0], responseBodies[1]);
+        assertThat(responseBodies[1], equalTo(responseBodies[0]));
     }
 }
