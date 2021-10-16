@@ -9,8 +9,7 @@ import org.junit.runner.RunWith;
         features = "src/test/java/com/typicode/jsonplaceholder/features",
         glue = "com.typicode.jsonplaceholder.steps",
         tags = "not @skip",
-        plugin = {"pretty", "html:target/cucumber-report.html"},
-        publish = true
+        plugin = {"pretty", "html:target/cucumber-report.html"}
 )
 
 public class TestRunner {
