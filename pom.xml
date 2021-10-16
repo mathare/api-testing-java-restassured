@@ -13,7 +13,6 @@
         <maven.compiler.target>11</maven.compiler.target>
         <restassured.version>4.4.0</restassured.version>
         <cucumber.version>6.11.0</cucumber.version>
-        <json.version>20210307</json.version>
     </properties>
 
     <dependencies>
@@ -38,11 +37,6 @@
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit</artifactId>
             <version>${cucumber.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>${json.version}</version>
         </dependency>
     </dependencies>
 

@@ -42,4 +42,20 @@ public class RequestHelpers {
         //Strip off initial &
         return "?" + paramString.substring(1);
     }
+
+    //This could be done with a library such as org.json to convert the map to a JSONObject
+    //and then to a string but since it's a simple operation I have implemented it myself
+    public static String buildJsonString(Map<String, String> params) {
+        StringBuilder requestBody = new StringBuilder("{");
+        for (String key : new ArrayList<>(params.keySet())) {
+            requestBody
+                    .append("\"").append(key).append("\"")
+                    .append(":")
+                    .append("\"").append(params.get(key)).append("\"")
+                    .append(",");
+        }
+        requestBody.deleteCharAt(requestBody.lastIndexOf(","));
+        requestBody.append("}");
+        return requestBody.toString();
+    }
 }
