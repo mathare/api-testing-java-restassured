@@ -14,16 +14,18 @@
         <restassured.version>4.4.0</restassured.version>
         <cucumber.version>6.11.0</cucumber.version>
         <json.version>20210307</json.version>
-        <json.schema.version>1.5.1</json.schema.version>
     </properties>
 
     <dependencies>
         <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${restassured.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
+            <artifactId>json-schema-validator</artifactId>
             <version>${restassured.version}</version>
             <scope>test</scope>
         </dependency>
@@ -41,11 +43,6 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <version>${json.schema.version}</version>
         </dependency>
     </dependencies>
 

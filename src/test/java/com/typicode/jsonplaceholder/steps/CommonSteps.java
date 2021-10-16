@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -126,14 +128,7 @@ public class CommonSteps {
     @Then("the response body follows the {string} JSON schema")
     public static void verifyResponseBodyAgainstJsonSchema(String type) throws IOException {
         String filename = SCHEMAS_DIR + type.replaceAll(" ", "") + "Schema.json";
-        String json = Files.readString(new File(filename).toPath());
-        JSONObject schemaObject = new JSONObject(json);
-        Schema expectedSchema = SchemaLoader.load(schemaObject);
-        if (response.asString().startsWith("[")) {
-            expectedSchema.validate(new JSONArray(response.asString()));
-        } else {
-            expectedSchema.validate(new JSONObject(response.asString()));
-        }
+        assertThat(response.asString(), matchesJsonSchema(new File(filename)));
     }
 
     @Then("the results array contains {int} elements")
