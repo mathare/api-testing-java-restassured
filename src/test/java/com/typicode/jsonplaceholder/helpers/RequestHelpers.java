@@ -8,32 +8,32 @@ import java.util.Map;
 
 public class RequestHelpers {
 
-    private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
+    private static final String BASE_URL = "https://jsonplaceholder.typicode.com/";
 
     public static Response sendGetRequestTo(String endpoint) {
-        return RestAssured.given().get(BASE_URL + endpoint);
+        return RestAssured.given().get(BASE_URL + endpoint.toLowerCase());
     }
 
     public static Response sendGetRequestTo(String endpoint, Map<String, String> params) {
-        return RestAssured.given().queryParams(params).get(BASE_URL + endpoint);
+        return RestAssured.given().queryParams(params).get(BASE_URL + endpoint.toLowerCase());
     }
 
     public static Response sendPutRequestTo(String endpoint, String body) {
         return RestAssured.given()
                 .header("Content-Type", "application/json")
                 .body(body)
-                .put(BASE_URL + endpoint);
+                .put(BASE_URL + endpoint.toLowerCase());
     }
 
     public static Response sendPostRequestTo(String endpoint, String body) {
         return RestAssured.given()
                 .header("Content-Type", "application/json")
                 .body(body)
-                .post(BASE_URL + endpoint);
+                .post(BASE_URL + endpoint.toLowerCase());
     }
 
     public static Response sendDeleteRequestTo(String endpoint) {
-        return RestAssured.given().delete(BASE_URL + endpoint);
+        return RestAssured.given().delete(BASE_URL + endpoint.toLowerCase());
     }
 
     //This could be done with a library such as org.json to convert the map to a JSONObject

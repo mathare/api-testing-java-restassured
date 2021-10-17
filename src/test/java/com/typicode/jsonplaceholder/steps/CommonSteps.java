@@ -20,22 +20,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class CommonSteps {
 
-    private static final String POSTS_ENDPOINT = "/posts";
-    private static final String COMMENTS_ENDPOINT = "/comments";
-    private static final String ALBUMS_ENDPOINT = "/albums";
-    private static final String PHOTOS_ENDPOINT = "/photos";
-    private static final String TODOS_ENDPOINT = "/todos";
-    private static final String USERS_ENDPOINT = "/users";
-
-    private static final Map<String, String> endpoints = Map.ofEntries(
-            Map.entry("Posts", POSTS_ENDPOINT),
-            Map.entry("Comments", COMMENTS_ENDPOINT),
-            Map.entry("Albums", ALBUMS_ENDPOINT),
-            Map.entry("Photos", PHOTOS_ENDPOINT),
-            Map.entry("ToDos", TODOS_ENDPOINT),
-            Map.entry("Users", USERS_ENDPOINT)
-    );
-
     private static final String BASE_RESOURCES_DIR = "src/test/resources/";
     private static final String SCHEMAS_DIR = BASE_RESOURCES_DIR + "schemas/";
     private static final String EXPECTED_RESPONSES_DIR = BASE_RESOURCES_DIR + "expectedResponses/";
@@ -51,32 +35,32 @@ public class CommonSteps {
     @When("^I make a (GET|DELETE) request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint$")
     public static void makeRequest(String requestType, String endpoint) {
         response = requestType.equals("GET") ?
-                RequestHelpers.sendGetRequestTo(endpoints.get(endpoint)) :
-                RequestHelpers.sendDeleteRequestTo((endpoints.get(endpoint)));
+                RequestHelpers.sendGetRequestTo(endpoint) :
+                RequestHelpers.sendDeleteRequestTo(endpoint);
         responses.add(response);
     }
 
     @When("^I make a (GET|DELETE) request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with a path parameter of (-?\\d+)$")
     public static void makeRequest(String requestType, String endpoint, int pathParam) {
         response = requestType.equals("GET") ?
-                RequestHelpers.sendGetRequestTo(endpoints.get(endpoint) + "/" + pathParam) :
-                RequestHelpers.sendDeleteRequestTo(endpoints.get(endpoint) + "/" + pathParam);
+                RequestHelpers.sendGetRequestTo(endpoint + "/" + pathParam) :
+                RequestHelpers.sendDeleteRequestTo(endpoint + "/" + pathParam);
         responses.add(response);
     }
 
     @When("^I make a (POST|PUT) request with an empty body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint$")
     public static void makeRequestWithEmptyBody(String requestType, String endpoint) {
         response = requestType.equals("POST") ?
-                RequestHelpers.sendPostRequestTo(endpoints.get(endpoint), "{}") :
-                RequestHelpers.sendPutRequestTo(endpoints.get(endpoint), "{}");
+                RequestHelpers.sendPostRequestTo(endpoint, "{}") :
+                RequestHelpers.sendPutRequestTo(endpoint, "{}");
         responses.add(response);
     }
 
     @When("^I make a (POST|PUT) request with an empty body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with a path parameter of (-?\\d+)$")
     public static void makeRequestWithEmptyBody(String requestType, String endpoint, int pathParam) {
         response = requestType.equals("POST") ?
-                RequestHelpers.sendPostRequestTo(endpoints.get(endpoint) + "/" + pathParam, "{}") :
-                RequestHelpers.sendPutRequestTo(endpoints.get(endpoint) + "/" + pathParam, "{}");
+                RequestHelpers.sendPostRequestTo(endpoint + "/" + pathParam, "{}") :
+                RequestHelpers.sendPutRequestTo(endpoint + "/" + pathParam, "{}");
         responses.add(response);
     }
 
@@ -84,8 +68,8 @@ public class CommonSteps {
     public static void makeRequestWithBody(String requestType, String endpoint, DataTable dataTable) {
         Map<String, String> requestBodyMap = dataTable.rows(1).asMap(String.class, String.class);
         response = requestType.equals("POST") ?
-                RequestHelpers.sendPostRequestTo(endpoints.get(endpoint), RequestHelpers.buildJsonString(requestBodyMap)) :
-                RequestHelpers.sendPutRequestTo(endpoints.get(endpoint), RequestHelpers.buildJsonString(requestBodyMap));
+                RequestHelpers.sendPostRequestTo(endpoint, RequestHelpers.buildJsonString(requestBodyMap)) :
+                RequestHelpers.sendPutRequestTo(endpoint, RequestHelpers.buildJsonString(requestBodyMap));
         responses.add(response);
     }
 
@@ -93,8 +77,8 @@ public class CommonSteps {
     public static void makeRequestWithBody(String requestType, String endpoint, int pathParam, DataTable dataTable) {
         Map<String, String> requestBodyMap = dataTable.subTable(1, 0).asMap(String.class, String.class);
         response = requestType.equals("POST") ?
-                RequestHelpers.sendPostRequestTo(endpoints.get(endpoint) + "/" + pathParam, RequestHelpers.buildJsonString(requestBodyMap)) :
-                RequestHelpers.sendPutRequestTo(endpoints.get(endpoint) + "/" + pathParam, RequestHelpers.buildJsonString(requestBodyMap));
+                RequestHelpers.sendPostRequestTo(endpoint + "/" + pathParam, RequestHelpers.buildJsonString(requestBodyMap)) :
+                RequestHelpers.sendPutRequestTo(endpoint + "/" + pathParam, RequestHelpers.buildJsonString(requestBodyMap));
         responses.add(response);
     }
 
@@ -102,13 +86,13 @@ public class CommonSteps {
     public static void makeGetRequestWithQueryParameter(String endpoint, String key, String value) {
         Map<String, String> params = new HashMap<>();
         params.put(key, value);
-        response = RequestHelpers.sendGetRequestTo(endpoints.get(endpoint), params);
+        response = RequestHelpers.sendGetRequestTo(endpoint, params);
         responses.add(response);
     }
 
     @When("^I make a GET request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with nested path parameters of (-?\\d+\\/\\w+)$")
     public static void makeRequestWithNestedParameters(String endpoint, String nestedParam) {
-        response = RequestHelpers.sendGetRequestTo(endpoints.get(endpoint) + "/" + nestedParam);
+        response = RequestHelpers.sendGetRequestTo(endpoint + "/" + nestedParam);
         responses.add(response);
     }
 
