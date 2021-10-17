@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class RequestHelpers {
@@ -12,7 +11,7 @@ public class RequestHelpers {
     private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     public static Response sendGetRequestTo(String endpoint) {
-        return RestAssured.get(BASE_URL + endpoint);
+        return RestAssured.given().get(BASE_URL + endpoint);
     }
 
     public static Response sendGetRequestTo(String endpoint, Map<String, String> params) {
@@ -34,7 +33,7 @@ public class RequestHelpers {
     }
 
     public static Response sendDeleteRequestTo(String endpoint) {
-        return RestAssured.delete(BASE_URL + endpoint);
+        return RestAssured.given().delete(BASE_URL + endpoint);
     }
 
     //This could be done with a library such as org.json to convert the map to a JSONObject
