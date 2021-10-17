@@ -104,7 +104,7 @@ public class CommonSteps {
     public static void makeGetRequestWithQueryParameter(String endpoint, String key, String value) {
         Map<String, String> params = new HashMap<>();
         params.put(key, value);
-        response = RequestHelpers.sendGetRequestTo(endpoints.get(endpoint) + RequestHelpers.buildQueryParamsString(params));
+        response = RequestHelpers.sendGetRequestTo(endpoints.get(endpoint), params);
         responses.add(response);
     }
 

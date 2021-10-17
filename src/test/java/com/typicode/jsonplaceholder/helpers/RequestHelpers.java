@@ -15,6 +15,10 @@ public class RequestHelpers {
         return RestAssured.get(BASE_URL + endpoint);
     }
 
+    public static Response sendGetRequestTo(String endpoint, Map<String, String> params) {
+        return RestAssured.given().queryParams(params).get(BASE_URL + endpoint);
+    }
+
     public static Response sendPutRequestTo(String endpoint, String body) {
         return RestAssured.given()
                 .header("Content-Type", "application/json")
@@ -31,16 +35,6 @@ public class RequestHelpers {
 
     public static Response sendDeleteRequestTo(String endpoint) {
         return RestAssured.delete(BASE_URL + endpoint);
-    }
-
-    public static String buildQueryParamsString(Map<String, String> params) {
-        StringBuilder paramString = new StringBuilder();
-        List<String> keys = new ArrayList<>(params.keySet());
-        for (String key : keys) {
-            paramString.append("&").append(key).append("=").append(params.get(key));
-        }
-        //Strip off initial &
-        return "?" + paramString.substring(1);
     }
 
     //This could be done with a library such as org.json to convert the map to a JSONObject
