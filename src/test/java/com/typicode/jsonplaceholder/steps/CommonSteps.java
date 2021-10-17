@@ -10,7 +10,6 @@ import io.restassured.response.Response;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -131,10 +130,10 @@ public class CommonSteps {
     }
 
     @Then("the response body matches the {string} expected response")
-    public static void verifyResponseBodyAgainstExpectedResponse(String expectedResponse) throws IOException {
+    public static void verifyResponseBodyAgainstExpectedResponse(String expectedResponse) {
         String filename = EXPECTED_RESPONSES_DIR + expectedResponse.replaceAll(" ", "") + "Response.json";
-        String json = Files.readString(new File(filename).toPath());
-        assertThat(response.asString(), equalTo(json.replace("\r", "")));
+        Object expected = JsonPath.from(new File(filename)).get();
+        assertThat(JsonPath.from(response.asString()).get(), equalTo(expected));
     }
 
     @Then("^the response body matches the (\\d+).{2} (?:post|comment|album|todo|user) in the \"(.*)\" expected response$")
