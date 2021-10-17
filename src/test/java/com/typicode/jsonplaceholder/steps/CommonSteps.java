@@ -9,7 +9,6 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,7 +118,7 @@ public class CommonSteps {
     }
 
     @Then("the response body follows the {string} JSON schema")
-    public static void verifyResponseBodyAgainstJsonSchema(String type) throws IOException {
+    public static void verifyResponseBodyAgainstJsonSchema(String type) {
         String filename = SCHEMAS_DIR + type.replaceAll(" ", "") + "Schema.json";
         assertThat(response.asString(), matchesJsonSchema(new File(filename)));
     }
@@ -137,7 +136,7 @@ public class CommonSteps {
     }
 
     @Then("^the response body matches the (\\d+).{2} (?:post|comment|album|todo|user) in the \"(.*)\" expected response$")
-    public static void verifyResponseBodyAgainstPartOfExpectedResponse(int index, String expectedResponse) throws IOException {
+    public static void verifyResponseBodyAgainstPartOfExpectedResponse(int index, String expectedResponse) {
         String filename = EXPECTED_RESPONSES_DIR + expectedResponse.replaceAll(" ", "") + "Response.json";
         Object expected = JsonPath.from(new File(filename)).getList("$").get(index - 1);
         assertThat(JsonPath.from(response.asString()).get(), equalTo(expected));
