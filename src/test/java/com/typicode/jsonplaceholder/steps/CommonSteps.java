@@ -1,12 +1,13 @@
 package com.typicode.jsonplaceholder.steps;
 
-import com.typicode.jsonplaceholder.helpers.RequestHelpers;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,73 +27,89 @@ public class CommonSteps {
 
     public static Response response;
     public static List<Response> responses;
+    private RequestSpecification request;
 
     @Before
     public static void setup() {
+        RestAssured.baseURI = "https://jsonplaceholder.typicode.com/";
+        request = RestAssured.given();
+        request.header("Content-Type", "application/json");
         responses = new ArrayList<>();
     }
 
     @When("^I make a (GET|DELETE) request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint$")
     public static void makeRequest(String requestType, String endpoint) {
+        endpoint = endpoint.toLowerCase();
         response = requestType.equals("GET") ?
-                RequestHelpers.sendGetRequestTo(endpoint) :
-                RequestHelpers.sendDeleteRequestTo(endpoint);
+                request.get(endpoint) :
+                request.delete(endpoint);
         responses.add(response);
     }
 
     @When("^I make a (GET|DELETE) request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with a path parameter of (-?\\d+)$")
     public static void makeRequest(String requestType, String endpoint, int pathParam) {
+        endpoint = endpoint.toLowerCase();
         response = requestType.equals("GET") ?
-                RequestHelpers.sendGetRequestTo(endpoint + "/" + pathParam) :
-                RequestHelpers.sendDeleteRequestTo(endpoint + "/" + pathParam);
+                request.get(endpoint + "/" + pathParam) :
+                request.delete(endpoint + "/" + pathParam);
         responses.add(response);
     }
 
     @When("^I make a (POST|PUT) request with an empty body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint$")
     public static void makeRequestWithEmptyBody(String requestType, String endpoint) {
+        endpoint = endpoint.toLowerCase();
+        request.body("{}");
         response = requestType.equals("POST") ?
-                RequestHelpers.sendPostRequestTo(endpoint, "{}") :
-                RequestHelpers.sendPutRequestTo(endpoint, "{}");
+                request.post(endpoint) :
+                request.put(endpoint);
         responses.add(response);
     }
 
     @When("^I make a (POST|PUT) request with an empty body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with a path parameter of (-?\\d+)$")
     public static void makeRequestWithEmptyBody(String requestType, String endpoint, int pathParam) {
+        endpoint = endpoint.toLowerCase();
+        request.body("{}");
         response = requestType.equals("POST") ?
-                RequestHelpers.sendPostRequestTo(endpoint + "/" + pathParam, "{}") :
-                RequestHelpers.sendPutRequestTo(endpoint + "/" + pathParam, "{}");
+                request.post(endpoint + "/" + pathParam) :
+                request.put(endpoint + "/" + pathParam);
         responses.add(response);
     }
 
     @When("^I make a (POST|PUT) request with the following body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint$")
     public static void makeRequestWithBody(String requestType, String endpoint, DataTable dataTable) {
+        endpoint = endpoint.toLowerCase();
         Map<String, String> requestBodyMap = dataTable.rows(1).asMap(String.class, String.class);
+        request.body(buildJsonString(requestBodyMap));
         response = requestType.equals("POST") ?
-                RequestHelpers.sendPostRequestTo(endpoint, RequestHelpers.buildJsonString(requestBodyMap)) :
-                RequestHelpers.sendPutRequestTo(endpoint, RequestHelpers.buildJsonString(requestBodyMap));
+                request.post(endpoint) :
+                request.put(endpoint);
         responses.add(response);
     }
 
     @When("^I make a (POST|PUT) request with the following body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with a path parameter of (-?\\d+)$")
     public static void makeRequestWithBody(String requestType, String endpoint, int pathParam, DataTable dataTable) {
+        endpoint = endpoint.toLowerCase();
         Map<String, String> requestBodyMap = dataTable.subTable(1, 0).asMap(String.class, String.class);
+        request.body(buildJsonString(requestBodyMap));
         response = requestType.equals("POST") ?
-                RequestHelpers.sendPostRequestTo(endpoint + "/" + pathParam, RequestHelpers.buildJsonString(requestBodyMap)) :
-                RequestHelpers.sendPutRequestTo(endpoint + "/" + pathParam, RequestHelpers.buildJsonString(requestBodyMap));
+                request.post(endpoint + "/" + pathParam) :
+                request.put(endpoint + "/" + pathParam);
         responses.add(response);
     }
 
     @When("^I make a GET request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with an? \"(.*)\" query parameter of (.*)$")
     public static void makeGetRequestWithQueryParameter(String endpoint, String key, String value) {
+        endpoint = endpoint.toLowerCase();
         Map<String, String> params = new HashMap<>();
         params.put(key, value);
-        response = RequestHelpers.sendGetRequestTo(endpoint, params);
+        response = request.queryParams(params).get(endpoint);
         responses.add(response);
     }
 
     @When("^I make a GET request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with nested path parameters of (-?\\d+\\/\\w+)$")
     public static void makeRequestWithNestedParameters(String endpoint, String nestedParam) {
-        response = RequestHelpers.sendGetRequestTo(endpoint + "/" + nestedParam);
+        endpoint = endpoint.toLowerCase();
+        response = request.get(endpoint + "/" + nestedParam);
         responses.add(response);
     }
 
@@ -134,6 +151,21 @@ public class CommonSteps {
         expectedBody.forEach((k, v) -> assertThat(actual.get(k).toString(), equalTo(expectedBody.get(k))));
     }
 
+    @Then("^the \"(id|userId)\" field in the response body has a value of (\\d+)$")
+    public void verifyResponseFieldValue(String field, int value) {
+        assertThat(JsonPath.from(response.asString()).get(field), equalTo(value));
+    }
+
+    @Then("the {string} field in the response body has a value of {string}")
+    public void verifyResponseFieldValue(String field, String value) {
+        assertThat(JsonPath.from(response.asString()).get(field), equalTo(value));
+    }
+
+    @Then("the {string} field in the response body has a value of")
+    public void verifyResponseFieldDocstring(String field, String value) {
+        assertThat(JsonPath.from(response.asString()).get(field), equalTo(value));
+    }
+
     @Then("the response body is an empty JSON object")
     public static void verifyResponseBodyIsEmptyJSONObject() {
         assertThat(response.asString(), equalTo("{}"));
@@ -150,5 +182,21 @@ public class CommonSteps {
             }
         }
         assertThat(responseBodies[1], equalTo(responseBodies[0]));
+    }
+
+    //This could be done with a library such as org.json to convert the map to a JSONObject
+    //and then to a string but since it's a simple operation I have implemented it myself
+    private String buildJsonString(Map<String, String> params) {
+        StringBuilder requestBody = new StringBuilder("{");
+        for (String key : new ArrayList<>(params.keySet())) {
+            requestBody
+                    .append("\"").append(key).append("\"")
+                    .append(":")
+                    .append("\"").append(params.get(key)).append("\"")
+                    .append(",");
+        }
+        requestBody.deleteCharAt(requestBody.lastIndexOf(","));
+        requestBody.append("}");
+        return requestBody.toString();
     }
 }
