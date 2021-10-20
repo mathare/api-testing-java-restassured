@@ -21,16 +21,16 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class CommonSteps {
 
-    private static final String BASE_RESOURCES_DIR = "src/test/resources/";
-    private static final String SCHEMAS_DIR = BASE_RESOURCES_DIR + "schemas/";
-    private static final String EXPECTED_RESPONSES_DIR = BASE_RESOURCES_DIR + "expectedResponses/";
+    private final String BASE_RESOURCES_DIR = "src/test/resources/";
+    private final String SCHEMAS_DIR = BASE_RESOURCES_DIR + "schemas/";
+    private final String EXPECTED_RESPONSES_DIR = BASE_RESOURCES_DIR + "expectedResponses/";
 
-    public static Response response;
-    public static List<Response> responses;
     private RequestSpecification request;
+    private Response response;
+    private List<Response> responses;
 
     @Before
-    public static void setup() {
+    public void setup() {
         RestAssured.baseURI = "https://jsonplaceholder.typicode.com/";
         request = RestAssured.given();
         request.header("Content-Type", "application/json");
@@ -38,7 +38,7 @@ public class CommonSteps {
     }
 
     @When("^I make a (GET|DELETE) request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint$")
-    public static void makeRequest(String requestType, String endpoint) {
+    public void makeRequest(String requestType, String endpoint) {
         endpoint = endpoint.toLowerCase();
         response = requestType.equals("GET") ?
                 request.get(endpoint) :
@@ -47,7 +47,7 @@ public class CommonSteps {
     }
 
     @When("^I make a (GET|DELETE) request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with a path parameter of (-?\\d+)$")
-    public static void makeRequest(String requestType, String endpoint, int pathParam) {
+    public void makeRequest(String requestType, String endpoint, int pathParam) {
         endpoint = endpoint.toLowerCase();
         response = requestType.equals("GET") ?
                 request.get(endpoint + "/" + pathParam) :
@@ -56,7 +56,7 @@ public class CommonSteps {
     }
 
     @When("^I make a (POST|PUT) request with an empty body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint$")
-    public static void makeRequestWithEmptyBody(String requestType, String endpoint) {
+    public void makeRequestWithEmptyBody(String requestType, String endpoint) {
         endpoint = endpoint.toLowerCase();
         request.body("{}");
         response = requestType.equals("POST") ?
@@ -66,7 +66,7 @@ public class CommonSteps {
     }
 
     @When("^I make a (POST|PUT) request with an empty body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with a path parameter of (-?\\d+)$")
-    public static void makeRequestWithEmptyBody(String requestType, String endpoint, int pathParam) {
+    public void makeRequestWithEmptyBody(String requestType, String endpoint, int pathParam) {
         endpoint = endpoint.toLowerCase();
         request.body("{}");
         response = requestType.equals("POST") ?
@@ -76,7 +76,7 @@ public class CommonSteps {
     }
 
     @When("^I make a (POST|PUT) request with the following body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint$")
-    public static void makeRequestWithBody(String requestType, String endpoint, DataTable dataTable) {
+    public void makeRequestWithBody(String requestType, String endpoint, DataTable dataTable) {
         endpoint = endpoint.toLowerCase();
         Map<String, String> requestBodyMap = dataTable.rows(1).asMap(String.class, String.class);
         request.body(buildJsonString(requestBodyMap));
@@ -87,7 +87,7 @@ public class CommonSteps {
     }
 
     @When("^I make a (POST|PUT) request with the following body to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with a path parameter of (-?\\d+)$")
-    public static void makeRequestWithBody(String requestType, String endpoint, int pathParam, DataTable dataTable) {
+    public void makeRequestWithBody(String requestType, String endpoint, int pathParam, DataTable dataTable) {
         endpoint = endpoint.toLowerCase();
         Map<String, String> requestBodyMap = dataTable.subTable(1, 0).asMap(String.class, String.class);
         request.body(buildJsonString(requestBodyMap));
@@ -98,7 +98,7 @@ public class CommonSteps {
     }
 
     @When("^I make a GET request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with an? \"(.*)\" query parameter of (.*)$")
-    public static void makeGetRequestWithQueryParameter(String endpoint, String key, String value) {
+    public void makeGetRequestWithQueryParameter(String endpoint, String key, String value) {
         endpoint = endpoint.toLowerCase();
         Map<String, String> params = new HashMap<>();
         params.put(key, value);
@@ -107,44 +107,44 @@ public class CommonSteps {
     }
 
     @When("^I make a GET request to the (Posts|Comments|Albums|Photos|ToDos|Users) endpoint with nested path parameters of (-?\\d+\\/\\w+)$")
-    public static void makeRequestWithNestedParameters(String endpoint, String nestedParam) {
+    public void makeRequestWithNestedParameters(String endpoint, String nestedParam) {
         endpoint = endpoint.toLowerCase();
         response = request.get(endpoint + "/" + nestedParam);
         responses.add(response);
     }
 
     @Then("the response has a status code of {int}")
-    public static void verifyResponseStatusCode(int code) {
+    public void verifyResponseStatusCode(int code) {
         assertThat(response.getStatusCode(), equalTo(code));
     }
 
     @Then("the response body follows the {string} JSON schema")
-    public static void verifyResponseBodyAgainstJsonSchema(String type) {
+    public void verifyResponseBodyAgainstJsonSchema(String type) {
         String filename = SCHEMAS_DIR + type.replaceAll(" ", "") + "Schema.json";
         assertThat(response.asString(), matchesJsonSchema(new File(filename)));
     }
 
     @Then("the results array contains {int} elements")
-    public static void verifyNumberOfResultsArrayElements(int numElements) {
+    public void verifyNumberOfResultsArrayElements(int numElements) {
         assertThat(JsonPath.from(response.asString()).getList("$").size(), equalTo(numElements));
     }
 
     @Then("the response body matches the {string} expected response")
-    public static void verifyResponseBodyAgainstExpectedResponse(String expectedResponse) {
+    public void verifyResponseBodyAgainstExpectedResponse(String expectedResponse) {
         String filename = EXPECTED_RESPONSES_DIR + expectedResponse.replaceAll(" ", "") + "Response.json";
         Object expected = JsonPath.from(new File(filename)).get();
         assertThat(JsonPath.from(response.asString()).get(), equalTo(expected));
     }
 
     @Then("^the response body matches the (\\d+).{2} (?:post|comment|album|todo|user) in the \"(.*)\" expected response$")
-    public static void verifyResponseBodyAgainstPartOfExpectedResponse(int index, String expectedResponse) {
+    public void verifyResponseBodyAgainstPartOfExpectedResponse(int index, String expectedResponse) {
         String filename = EXPECTED_RESPONSES_DIR + expectedResponse.replaceAll(" ", "") + "Response.json";
         Object expected = JsonPath.from(new File(filename)).getList("$").get(index - 1);
         assertThat(JsonPath.from(response.asString()).get(), equalTo(expected));
     }
 
     @Then("the response body matches the following")
-    public static void verifyResponseBodyAgainstDataTable(DataTable dataTable) {
+    public void verifyResponseBodyAgainstDataTable(DataTable dataTable) {
         Map<String, String> expectedBody = dataTable.subTable(1, 0).asMap(String.class, String.class);
         JsonPath actual = JsonPath.from(response.asString());
         assertThat(actual.getMap("$").keySet(), equalTo(expectedBody.keySet()));
@@ -167,12 +167,12 @@ public class CommonSteps {
     }
 
     @Then("the response body is an empty JSON object")
-    public static void verifyResponseBodyIsEmptyJSONObject() {
+    public void verifyResponseBodyIsEmptyJSONObject() {
         assertThat(response.asString(), equalTo("{}"));
     }
 
     @Then("the two response bodies are identical")
-    public static void verifyResponseBodiesMatch() {
+    public void verifyResponseBodiesMatch() {
         String[] responseBodies = {responses.get(responses.size() - 2).asString(), responses.get(responses.size() - 1).asString()};
         for (int i = 0; i < responseBodies.length; i++) {
             if (responseBodies[i].startsWith("[")) {
